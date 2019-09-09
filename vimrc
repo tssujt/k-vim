@@ -382,6 +382,8 @@ function! XTermPasteBegin()
 endfunction
 inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
 
+set clipboard+=unnamedplus
+
 
 
 " 分屏窗口移动, Smart way to move between windows
@@ -652,13 +654,14 @@ if has("gui_running")
 endif
 
 
-
 " theme主题
-set background=dark
+set background=light
 set t_Co=256
 
-colorscheme solarized
+" colorscheme solarized
 " colorscheme molokai
+colorscheme neodark
+" color dracula
 
 
 " 设置标记一列的背景颜色和数字一行颜色一致

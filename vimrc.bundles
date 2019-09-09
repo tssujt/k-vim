@@ -5,7 +5,7 @@
 "------------------------------------------- begin of configs --------------------------------------------
 
 " ################### 包依赖 #####################
-" package dependence:  ctags, ag(he_silver_searcher)
+" package dependence:  ctags, ag(the_silver_searcher)
 " python dependence:   pep8, pyflake
 
 " 非兼容vi模式。去掉讨厌的有关vi一致性模式，避免以前版本的一些bug和局限
@@ -122,6 +122,7 @@ Plug 'tpope/vim-fugitive'
 " gitgutter
 Plug 'airblade/vim-gitgutter'
 
+
 " gundo
 " edit history, 可以查看回到某个历史状态
 Plug 'sjl/gundo.vim'
@@ -140,11 +141,14 @@ Plug 'altercation/vim-colors-solarized'
 " molokai
 " 主题 molokai
 Plug 'tomasr/molokai'
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'KeitaNakamura/neodark.vim'
 
 
 " nav
 " nerdtree nerdtreetabs
 Plug 'scrooloose/nerdtree' | Plug 'jistr/vim-nerdtree-tabs'
+Plug 'Xuyuanp/nerdtree-git-plugin'
 " ctrlspace
 Plug 'vim-ctrlspace/vim-ctrlspace'
 " tagbar
@@ -748,6 +752,7 @@ endif
 
     " nerdtreetabs
     map <Leader>n <plug>NERDTreeTabsToggle<CR>
+    map <Leader>f :NERDTreeFind<CR>
     " 关闭同步
     " let g:nerdtree_tabs_synchronize_view=0
     " let g:nerdtree_tabs_synchronize_focus=0
@@ -755,6 +760,22 @@ endif
     " thank to @ListenerRi, see https://github.com/wklken/k-vim/issues/165
     let g:nerdtree_tabs_open_on_console_startup=0
     let g:nerdtree_tabs_open_on_gui_startup=0
+
+
+    " NERDTREE-GIT
+    " Special characters
+    let g:NERDTreeIndicatorMapCustom = {
+        \ "Modified"  : "✹",
+        \ "Staged"    : "✚",
+        \ "Untracked" : "✭",
+        \ "Renamed"   : "➜",
+        \ "Unmerged"  : "═",
+        \ "Deleted"   : "✖",
+        \ "Dirty"     : "✗",
+        \ "Clean"     : "✔︎",
+        \ 'Ignored'   : '☒',
+        \ "Unknown"   : "?"
+    \ }
 " }}}
 
 
