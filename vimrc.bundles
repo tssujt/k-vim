@@ -111,6 +111,9 @@ Plug 'dyng/ctrlsf.vim'
 " map /  <Plug>(incsearch-forward)
 " map ?  <Plug>(incsearch-backward)
 " map g/ <Plug>(incsearch-stay)
+"
+" ag
+Plug 'mileszs/ack.vim'
 
 " quick run
 " quickrun
@@ -194,6 +197,8 @@ if count(g:bundle_groups, 'python')
     Plug 'hdima/python-syntax'
     Plug 'hynek/vim-python-pep8-indent'
     Plug 'Glench/Vim-Jinja2-Syntax'
+
+    Plug 'jmcantrell/vim-virtualenv'
 
     " isort  https://github.com/timothycrosley/isort#readme + https://github.com/fisadev/vim-isort#installation
     " pip install isort
@@ -606,12 +611,25 @@ endif
     let g:ctrlp_mruf_max=500
     let g:ctrlp_follow_symlinks=1
     " 如果安装了ag, 使用ag
-    " if executable('ag')
-    " " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
-    " let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
-    " " ag is fast enough that CtrlP doesn't need to cache
+    map <Leader>c :Ack!<Space>
+    if executable('ag')
+    " Use ag in CtrlP for listing files. Lightning fast and respects .gitignore
+      let g:ctrlp_user_command = 'ag %s -l --nocolor -g ""'
+    " ag is fast enough that CtrlP doesn't need to cache
     " let g:ctrlp_use_caching = 0
-    " endif
+      let g:ackprg = 'ag --vimgrep'
+    " <Leader>c进行搜索，同时不自动打开第一个匹配的文件"
+    " 高亮搜索关键词
+      let g:ackhighlight = 1
+    " 修改快速预览窗口高度为15
+      let g:ack_qhandler = "botright copen 15"
+    " 在QuickFix窗口使用快捷键以后，自动关闭QuickFix窗口
+      let g:ack_autoclose = 1
+    " 使用ack的空白搜索，即不添加任何参数时对光标下的单词进行搜索，默认值为1，表示开启，置0以后使用空白搜索将返回错误信息
+      let g:ack_use_cword_for_empty_search = 1
+    " 部分功能受限，但对于大项目搜索速度较慢时可以尝试开启
+    " let g:ack_use_dispatch = 1
+    endif
 
     " ctrlpfunky
     " ctrlp插件1 - 不用ctag进行函数快速跳转
