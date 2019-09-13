@@ -72,6 +72,7 @@ set shortmess=atI
 
 " 取消备份。 视情况自己改
 set nobackup
+set nowritebackup
 " 关闭交换文件
 set noswapfile
 
@@ -503,6 +504,9 @@ autocmd TabLeave * let g:last_active_tab = tabpagenr()
 nnoremap <C-t>     :tabnew<CR>
 inoremap <C-t>     <Esc>:tabnew<CR>
 
+let g:loaded_python_provider = 0
+let g:python_host_prog = expand('~/.pyenv/versions/2.7.16/bin/python')
+let g:python3_host_prog = expand('~/.pyenv/versions/3.6.9/bin/python')
 
 " => 选中及操作改键
 
