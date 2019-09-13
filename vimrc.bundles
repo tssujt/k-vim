@@ -274,6 +274,13 @@ call plug#end()
     highlight clear ALEWarningSign
 " }}}
 
+" fzf {{{
+    let g:fzf_action = {
+        \ 'ctrl-t': 'tab split',
+        \ 'ctrl-x': 'split',
+        \ 'ctrl-v': 'vsplit' }
+" }}}
+
 " ################### 自动补全 ###################
 
 " LanguageClient {{{
@@ -299,8 +306,7 @@ call plug#end()
     let g:LanguageClient_loggingFile ="/tmp/langclient.log"
     let g:LanguageClient_useVirtualText = 0
 
-    let g:LanguageClient_fzfContextMenu = 1
-    let g:LanguageClient_selectionUI = "fzf"
+    let g:LanguageClient_selectionUI = "quickfix"
     let g:LanguageClient_diagnosticsEnable = 0
     let g:LanguageClient_diagnosticsList = "Disabled"
     let g:LanguageClient_completionPreferTextEdit = 1
