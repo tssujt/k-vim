@@ -169,15 +169,22 @@ Plug 'kana/vim-textobj-entire'
 " 增加缩进文本对象: i   dai yai cii - 相同缩进属于同一块
 Plug 'kana/vim-textobj-indent'
 
+if count(g:bundle_groups, 'python')
+    " python
+    Plug 'hynek/vim-python-pep8-indent'
+
+    Plug 'fisadev/vim-isort'
+endif
+
 if count(g:bundle_groups, 'tmux')
     " tmux
     " For tmux navigator Ctrl-hjkl
     Plug 'christoomey/vim-tmux-navigator'
 endif
 
-" if count(g:bundle_groups, 'shell')
-    " Plug 'Shougo/vimshell.vim'
-" endif
+if count(g:bundle_groups, 'shell')
+    Plug 'Shougo/vimshell.vim'
+endif
 
 if count(g:bundle_groups, 'json')
     " json
