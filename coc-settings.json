@@ -30,7 +30,7 @@
     "python.autoUpdateLanguageServer": true,
     "python.jediEnabled": false,
     "python.formatting.provider": "black",
-    "python.formatting.blackPath": "${env:HOME}/.pyenv/shims/black",
+    "python.formatting.blackPath": "~/.pyenv/shims/black",
     "python.linting.enabled": true,
     "python.linting.flake8Args": [
         "--format=pylint",
@@ -48,8 +48,8 @@
         "pylint_django"
     ],
     "python.pipenvPath": "/usr/local/bin/pipenv",
-    "python.pythonPath": "${env:HOME}/.pyenv/shims/python",
-    "python.sortImports.path": "${env:HOME}/.pyenv/shims/isort",
+    "python.pythonPath": "~/.pyenv/shims/python",
+    "python.sortImports.path": "~/.pyenv/shims/isort",
     "python.sortImports.args": [],
     "python.venvPath": "${workspaceFolder}",
     "python.venvFolders": [
