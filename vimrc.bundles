@@ -14,6 +14,11 @@ filetype off " required! turn off
 
 " ################### 插件管理 ###################
 
+" inspired by spf13, 自定义需要的插件集合
+if !exists('g:bundle_groups')
+    let g:bundle_groups=['python', 'javascript', 'markdown', 'html', 'css', 'tmux', 'beta']
+endif
+
 " ----------------------------------------------------------------------------
 " 使用 vim-plug 管理插件
 " vim plugin bundle control, command model
@@ -105,7 +110,12 @@ Plug 'dyng/ctrlsf.vim'
 " ag
 Plug 'mileszs/ack.vim'
 
-Plug 'neoclide/coc.nvim', {'do': 'yarn install --frozen-lockfile'}
+Plug 'autozimu/LanguageClient-neovim', {
+    \ 'branch': 'next',
+    \ 'do': 'bash install.sh',
+    \ }
+
+Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
@@ -119,6 +129,11 @@ Plug 'thinca/vim-quickrun'
 Plug 'tpope/vim-fugitive'
 " gitgutter
 Plug 'airblade/vim-gitgutter'
+
+
+" gundo
+" edit history, 可以查看回到某个历史状态
+Plug 'sjl/gundo.vim'
 
 " view
 " airline
@@ -157,50 +172,70 @@ Plug 'kana/vim-textobj-entire'
 " 增加缩进文本对象: i   dai yai cii - 相同缩进属于同一块
 Plug 'kana/vim-textobj-indent'
 
-" python
-Plug 'hynek/vim-python-pep8-indent'
+if count(g:bundle_groups, 'python')
+    " python
+    Plug 'hynek/vim-python-pep8-indent'
+
+    Plug 'fisadev/vim-isort'
+endif
+
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
 
-" tmux
-" For tmux navigator Ctrl-hjkl
-Plug 'christoomey/vim-tmux-navigator'
+if count(g:bundle_groups, 'tmux')
+    " tmux
+    " For tmux navigator Ctrl-hjkl
+    Plug 'christoomey/vim-tmux-navigator'
+endif
 
-Plug 'Shougo/vimshell.vim'
+if count(g:bundle_groups, 'shell')
+    Plug 'Shougo/vimshell.vim'
+endif
 
-" json
-Plug 'elzr/vim-json', {'for': 'json'}
+if count(g:bundle_groups, 'json')
+    " json
+    Plug 'elzr/vim-json', {'for': 'json'}
+endif
 
-" css
-" not work in iterm2 which terminal selection is not xterm-256, and it slow
-" Plug 'ap/vim-css-color'
+if count(g:bundle_groups, 'css')
+    " css
+    " not work in iterm2 which termianl selection is not xterm-256, and it slow
+    " Plug 'ap/vim-css-color'
 
-" 这个有坑, see issue https://github.com/wklken/k-vim/issues/49
-" Plug 'gorodinskiy/vim-coloresque'
-" Plug 'lilydjwg/colorizer'
+    " 这个有坑, see issue https://github.com/wklken/k-vim/issues/49
+    " Plug 'gorodinskiy/vim-coloresque'
+    " Plug 'lilydjwg/colorizer'
+endif
 
-" ###### vim.less : less 自动更新##########
-Plug 'groenewege/vim-less'
-" autocmd BufWritePost *.less :!lessc % > %:p:r.css
+if count(g:bundle_groups, 'less')
+    " ###### vim.less : less 自动更新##########
+    Plug 'groenewege/vim-less'
+    " autocmd BufWritePost *.less :!lessc % > %:p:r.css
+endif
 
-" ###### emmet HTML complete #########
-" Plug 'mattn/emmet-vim'
+if count(g:bundle_groups, 'html')
+    " ###### emmet HTML complete #########
+    " Plug 'mattn/emmet-vim'
+endif
 
 " this is just for beta version
-" indent
-Plug 'nathanaelkane/vim-indent-guides'
-" <leader>ig to trigger
-let g:indent_guides_start_level = 2
-let g:indent_guides_guide_size = 1
-let g:indent_guides_auto_colors = 1
-" autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=black
-" autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=black
+if count(g:bundle_groups, 'beta')
+    " indent
+    Plug 'nathanaelkane/vim-indent-guides'
+    " <leader>ig to trigger
+    let g:indent_guides_start_level = 2
+    let g:indent_guides_guide_size = 1
+    let g:indent_guides_auto_colors = 1
+    " autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=black
+    " autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=black
 
-" Plug 'robbles/logstash.vim'
-Plug 'ryanoasis/vim-devicons'
-Plug 'ekalinin/dockerfile.vim'
+    " Plug 'robbles/logstash.vim'
+    Plug 'ryanoasis/vim-devicons'
+    Plug 'ekalinin/dockerfile.vim'
 
-" Plug 'ConradIrwin/vim-bracketed-paste'
-" Plug 'roxma/vim-paste-easy'
+    Plug 'ConradIrwin/vim-bracketed-paste'
+    Plug 'roxma/vim-paste-easy'
+endif
+
 
 " Add plugins to &runtimepath
 call plug#end()
@@ -297,46 +332,97 @@ call plug#end()
 
 " ################### 自动补全 ###################
 
-" coc {{{
-    call coc#add_extension(
-      \ 'coc-css',
-      \ 'coc-html',
-      \ 'coc-ultisnips',
-      \ 'coc-json',
-      \ 'coc-tsserver',
-      \ 'coc-tslint',
-      \ 'coc-yaml',
-      \ 'coc-prettier',
-      \ 'coc-python',
-      \ 'coc-eslint',
-      \ 'coc-phpls',
-      \ 'coc-sh',
-      \ 'coc-docker',
-      \ 'coc-git',
-      \ 'coc-calc',
-      \ 'coc-post',
-      \ 'coc-vimlsp',
-      \ 'coc-lists',
-      \ 'coc-yank',
-      \ )
-    let g:airline#extensions#coc#enabled = 1
-    let airline#extensions#coc#error_symbol = 'E:'
-    let airline#extensions#coc#warning_symbol = 'W:'
-    let airline#extensions#coc#stl_format_err = '%E{[%e(#%fe)]}'
-    let airline#extensions#coc#stl_format_warn = '%W{[%w(#%fw)]}'
+" LanguageClient {{{
+    let g:LanguageClient_rootMarkers = {
+        \ 'rust': ['Cargo.toml', '.git'],
+        \ 'python': ['lain.yaml', '.git'],
+        \ }
 
-    " use <c-space>for trigger completion
-    inoremap <silent><expr> <c-space> coc#refresh()
+    let g:LanguageClient_serverCommands = {
+        \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+        \ 'python': ['pyls', '-v',  '-v', '--log-file=/tmp/pyls.log'],
+        \ 'vue': ['vls'],
+        \ 'sh': ['bash-language-server', 'start'],
+        \ 'dockerfile': ['docker-langserver', '--stdio'],
+        \ 'html': ['html-languageserver', '--stdio'],
+        \ 'css': ['css-languageserver', '--stdio'],
+        \ }
 
-    nmap <leader>ld <Plug>(coc-definition)
-    nmap <leader>lt <Plug>(coc-type-definition)
-    nmap <leader>li <Plug>(coc-implementation)
-    nmap <leader>lx <Plug>(coc-references)
-    nmap <leader>rn <Plug>(coc-rename)
-    nmap <leader>rf <Plug>(coc-refactor)
-    vmap <leader>lf <Plug>(coc-format-selected)
+    let $RUST_BACKTRACE = 1
+    let g:LanguageClient_loadSettings = 0 " Use an absolute configuration path if you want system-wide settings
+    let g:LanguageClient_settingsPath = expand('~/.config/nvim/settings.json')
+    let g:LanguageClient_serverStderr = '/tmp/langserver.log'
+    let g:LanguageClient_loggingFile ="/tmp/langclient.log"
+    let g:LanguageClient_useVirtualText = 0
 
-    autocmd FileType python let b:coc_root_patterns = ['.git', 'lain.yaml', 'setup.cfg', 'setup.py']
+    let g:LanguageClient_selectionUI = "quickfix"
+    let g:LanguageClient_diagnosticsEnable = 0
+    let g:LanguageClient_diagnosticsList = "Disabled"
+    let g:LanguageClient_completionPreferTextEdit = 1
+
+    " 把Server的补全API提交给Vim
+    " 一般有deoplete就可以用了，加上一条以防万一。
+    set completefunc=LanguageClient#complete
+    " 把Server的格式化API提交给Vim
+    set formatexpr=LanguageClient_textDocument_rangeFormatting()
+
+    inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+    inoremap <expr><S-tab> pumvisible() ? "\<c-p>" : "\<tab>"
+
+    function SetLSPShortcuts()
+        nnoremap <leader>ld :call LanguageClient#textDocument_definition({'gotoCmd': 'vsplit'})<CR>
+        nnoremap <leader>lr :call LanguageClient#textDocument_rename()<CR>
+        nnoremap <leader>lf :call LanguageClient#textDocument_formatting()<CR>
+        nnoremap <leader>lt :call LanguageClient#textDocument_typeDefinition()<CR>
+        nnoremap <leader>lx :call LanguageClient#textDocument_references()<CR>
+        nnoremap <leader>la :call LanguageClient_workspace_applyEdit()<CR>
+        nnoremap <leader>lc :call LanguageClient#textDocument_completion()<CR>
+        nnoremap <leader>lh :call LanguageClient#textDocument_hover()<CR>
+        nnoremap <leader>ls :call LanguageClient_textDocument_documentSymbol()<CR>
+        nnoremap <leader>lm :call LanguageClient_contextMenu()<CR>
+    endfunction()
+
+    augroup LSP
+      autocmd!
+      autocmd FileType cpp,c,python,rust call SetLSPShortcuts()
+    augroup END
+" }}}
+
+" deoplete {{{
+    let g:deoplete#enable_at_startup = 1
+    if !exists('g:deoplete#omni#input_patterns')
+        let g:deoplete#omni#input_patterns = {}
+    endif
+    inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
+    function! s:my_cr_function() abort
+        return deoplete#close_popup() . "\<CR>"
+    endfunction
+    " use tab / shift-tab to cycle through candidates
+    inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+    inoremap <silent><expr><s-tab> pumvisible() ? "\<c-p>" : "\<s-tab>"
+    call deoplete#custom#var('buffer', 'require_same_filetype', v:false)
+    " call deoplete#custom#source('_', 'matchers', ['matcher_cpsm'])
+    " call deoplete#custom#source('_', 'sorters', [])
+    call deoplete#custom#source('_', 'matchers', ['matcher_full_fuzzy'])
+    call deoplete#custom#option({
+                \ 'auto_complete_delay': 1,
+                \ 'auto_refresh_delay': 1,
+                \ 'smart_case': v:true,
+                \ 'on_insert_enter': v:false,
+                \ })
+
+    " see https://muunyblue.github.io/520bae6649b42ff5a3c8c58b7fcfc5a9.html
+    call deoplete#custom#option('sources', {
+        \ '_': ['file', 'around', 'buffer', 'ultisnips', 'LanguageClient'],
+        \ 'python': ['file', 'around', 'ultisnips', 'LanguageClient', 'buffer'],
+        \ 'vue': ['file', 'around', 'ultisnips', 'LanguageClient', 'buffer'],
+        \ 'sh': ['file', 'around', 'ultisnips', 'buffer', 'LanguageClient'],
+        \ 'lua': ['file', 'around', 'ultisnips', 'buffer', 'LanguageClient'],
+        \ 'dockerfile': ['file', 'around', 'ultisnips', 'buffer', 'LanguageClient'],
+        \})
+    " automatically close the scratch window
+    " see https://gregjs.com/vim/2016/configuring-the-deoplete-asynchronous-keyword-completion-plugin-with-tern-for-vim/
+    " autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 " }}}
 
 " ultisnips {{{
@@ -464,7 +550,7 @@ call plug#end()
 " ctrlp ctrlpfunky{{{
     let g:ctrlp_map = '<leader>p'
     let g:ctrlp_cmd = 'CtrlP'
-    nnoremap <leader>mru :CtrlPMRU<CR>
+    map <leader>mru :CtrlPMRU<CR>
     let g:ctrlp_custom_ignore = {
         \ 'dir':  '\v[\/]\.(git|hg|svn|rvm)$',
         \ 'file': '\v\.(exe|so|dll|zip|tar|tar.gz|pyc)$',
@@ -517,7 +603,7 @@ call plug#end()
     let g:ctrlsf_auto_close = 0
     let g:ctrlsf_confirm_save = 0
     " Note: cannot use <CR> or <C-m> for open
-    " Use : <space> or <tab>
+    " Use : <sapce> or <tab>
     let g:ctrlsf_mapping = {
         \ "open"  : "<Space>",
         \ "openb" : "O",
@@ -566,8 +652,8 @@ call plug#end()
     let g:airline_right_alt_sep = '❮'
     let g:airline_symbols.linenr = '¶'
     let g:airline_symbols.branch = '⎇'
-
-    let g:airline#extensions#tabline#enabled = 1
+    " 是否打开tabline
+    " let g:airline#extensions#tabline#enabled = 1
     let g:airline#extensions#ale#enabled = 1
     let g:airline#extensions#languageclient#enabled = 1
 " }}}
@@ -623,8 +709,7 @@ call plug#end()
 " nerdtree nerdtreetabs {{{
     " map <leader>n :NERDTreeToggle<CR>
     let NERDTreeHighlightCursorline=1
-    let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$',
-        \ '^\.svn$', '^\.hg$', '^__pycache__$', '^.DS_Store$', '^\.idea$', '^\.vscode$' ]
+    let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$', '^\.svn$', '^\.hg$', '^__pycache__$' ]
     "close vim if the only window left open is a NERDTree
     autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | end
     " s/v 分屏打开文件
@@ -632,8 +717,6 @@ call plug#end()
     let g:NERDTreeMapOpenVSplit = 'v'
     " fix Nerdtree ^G before folder and file names OSX terminal vim
     let g:NERDTreeNodeDelimiter = "\u00a0"
-
-    let g:NERDTreeShowHidden = 1
 
 
     " nerdtreetabs
@@ -664,27 +747,6 @@ call plug#end()
     \ }
 " }}}
 
-" devicons {{{
-    " loading the plugin
-    let g:webdevicons_enable = 1
-
-    " adding the flags to NERDTree
-    let g:webdevicons_enable_nerdtree = 1
-
-    " ctrlp glyphs
-    let g:webdevicons_enable_ctrlp = 1
-
-    " adding to vim-airline's tabline
-    let g:webdevicons_enable_airline_tabline = 1
-
-    " adding to vim-airline's statusline
-    let g:webdevicons_enable_airline_statusline = 1
-
-    " ctrlp glyphs
-    let g:webdevicons_enable_ctrlp = 1
-
-    let g:WebDevIconsOS = 'Darwin'
-" }}}
 
 " Vim Workspace Controller
 " ctrlspace {{{
@@ -729,6 +791,12 @@ call plug#end()
     nmap <Leader>r <Plug>(quickrun)
     map <F10> :QuickRun<CR>
 " }}}
+
+
+" pythonsyntax {{{
+    let python_highlight_all = 1
+" }}}
+
 
 " markdown {{{
     let g:vim_markdown_folding_disabled=1
