@@ -175,8 +175,8 @@ Plug 'kana/vim-textobj-indent'
 if count(g:bundle_groups, 'python')
     " python
     Plug 'hynek/vim-python-pep8-indent'
-
     Plug 'fisadev/vim-isort'
+    Plug 'psf/black'
 endif
 
 Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
@@ -235,7 +235,6 @@ if count(g:bundle_groups, 'beta')
     Plug 'ConradIrwin/vim-bracketed-paste'
     Plug 'roxma/vim-paste-easy'
 endif
-
 
 " Add plugins to &runtimepath
 call plug#end()
@@ -297,7 +296,7 @@ call plug#end()
 
     let g:hardtime_showmsg = 1
 
-    let g:hardtime_ignore_buffer_patterns = [ "NERD.*" ]
+    let g:hardtime_ignore_buffer_patterns = [ "NERD.*", "Tagbar.*" ]
     let g:hardtime_ignore_quickfix = 1
     let g:hardtime_allow_different_key = 1
     let g:hardtime_maxcount = 2
@@ -328,6 +327,19 @@ call plug#end()
     hi semshiErrorSign       ctermfg=231 guifg=#ffffff ctermbg=160 guibg=#d70000
     hi semshiErrorChar       ctermfg=231 guifg=#ffffff ctermbg=160 guibg=#d70000
     sign define semshiError text=E> texthl=semshiErrorSign
+" }}}
+
+" black {{{
+    let g:black_linelength = 80
+    let g:black_skip_string_normalization = 1
+    " autocmd BufWritePre *.py execute ':silent Black'
+" }}}
+
+" {{{
+    let g:vim_isort_map = ''
+    let g:vim_isort_config_overrides = {
+        \ 'include_trailing_comma': 0, 'multi_line_output': 5}
+    autocmd BufWritePre *.py execute ':Isort'
 " }}}
 
 " ################### 自动补全 ###################
@@ -622,22 +634,21 @@ call plug#end()
 " fugitive {{{
     " :Gdiff  :Gstatus :Gvsplit
     nnoremap <leader>ge :Gdiff<CR>
+    nnoremap <leader>gc :Gcommit<CR>
+    nnoremap <leader>gl :Glog<CR>
+    nnoremap <leader>gb :Gblame<CR>
     " not ready to open
-    " <leader>gb maps to :Gblame<CR>
     " <leader>gs maps to :Gstatus<CR>
     " <leader>gd maps to :Gdiff<CR>  和现有冲突
     " <leader>gl maps to :Glog<CR>
-    " <leader>gc maps to :Gcommit<CR>
     " <leader>gp maps to :Git push<CR>
 " }}}
 
 " gitgutter {{{
-    " 同git diff,实时展示文件中修改的行
-    " 只是不喜欢除了行号多一列, 默认关闭,gs时打开
     let g:gitgutter_map_keys = 0
-    let g:gitgutter_enabled = 0
+    let g:gitgutter_enabled = 1
     let g:gitgutter_highlight_lines = 1
-    nnoremap <leader>gs :GitGutterToggle<CR>
+    " nnoremap <leader>gs :GitGutterToggle<CR>
 " }}}
 
 " ################### 显示增强 ###################
