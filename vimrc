@@ -32,11 +32,7 @@ let g:mapleader = ','
 syntax on
 
 " install bundles
-if filereadable(expand("~/.vimrc.bundles"))
-  source ~/.vimrc.bundles
-elseif filereadable(expand("~/.config/nvim/vimrc.bundles")) " neovim
-  source ~/.config/nvim/vimrc.bundles
-endif
+source ~/.config/nvim/vimrc.bundles
 
 " ensure ftdetect et al work by including this after the bundle stuff
 filetype plugin indent on
@@ -75,7 +71,6 @@ set nobackup
 set nowritebackup
 " 关闭交换文件
 set noswapfile
-
 
 " TODO: remove this, use gundo
 " create undo file
@@ -220,6 +215,8 @@ set expandtab
 " 缩进时，取整 use multiple of shiftwidth when indenting with '<' and '>'
 set shiftround
 
+set spelllang=en,cjk
+
 " A buffer becomes hidden when it is abandoned
 set hidden
 set wildmode=list:longest
@@ -304,6 +301,7 @@ autocmd BufReadPost quickfix nnoremap <buffer> <CR> <CR>
 " quickfix window  s/v to open in split window,  ,gd/,jd => quickfix window => open it
 autocmd BufReadPost quickfix nnoremap <buffer> v <C-w><Enter><C-w>L
 autocmd BufReadPost quickfix nnoremap <buffer> s <C-w><Enter><C-w>K
+autocmd BufReadPost quickfix nnoremap <buffer> t <C-w><Enter><C-w>T
 
 " command-line window
 autocmd CmdwinEnter * nnoremap <buffer> <CR> <CR>
@@ -410,15 +408,12 @@ endfunction
 command! ZoomToggle call s:ZoomToggle()
 nnoremap <silent> <Leader>z :ZoomToggle<CR>
 
-
 " Go to home and end using capitalized directions
 noremap H ^
 noremap L $
 
-
 " Map ; to : and save a million keystrokes 用于快速进入命令行
-nnoremap ; :
-
+" nnoremap ; :
 
 " 命令行模式增强，ctrl - a到行首， -e 到行尾
 cnoremap <C-j> <t_kd>
@@ -578,6 +573,7 @@ nnoremap <leader>sv :source $MYVIMRC<CR>
 " 具体编辑文件类型的一般设置，比如不要 tab 等
 autocmd FileType python set tabstop=4 shiftwidth=4 expandtab ai
 autocmd FileType ruby,javascript,html,css,xml set tabstop=2 shiftwidth=2 softtabstop=2 expandtab ai
+autocmd FileType qf nnoremap <buffer> <Enter> <C-W><Enter><C-W>T
 autocmd BufRead,BufNewFile *.md,*.mkd,*.markdown set filetype=markdown.mkd
 autocmd BufRead,BufNewFile *.part set filetype=html
 autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript tabstop=2 shiftwidth=2 softtabstop=2 expandtab ai
@@ -585,9 +581,7 @@ autocmd BufRead,BufNewFile *.vue setlocal filetype=vue.html.javascript tabstop=2
 " disable showmatch when use > in php
 au BufWinEnter *.php set mps-=<:>
 
-
-
-" 保存python文件时删除多余空格
+" 保存文件时删除多余空格
 fun! <SID>StripTrailingWhitespaces()
     let l = line(".")
     let c = col(".")
@@ -598,7 +592,7 @@ autocmd FileType c,cpp,java,go,php,javascript,puppet,python,rust,twig,xml,yml,pe
 
 
 " 定义函数AutoSetFileHead，自动插入文件头
-autocmd BufNewFile *.sh,*.py exec ":call AutoSetFileHead()"
+autocmd BufNewFile *.sh,*.py,*.scm exec ":call AutoSetFileHead()"
 function! AutoSetFileHead()
     "如果文件类型为.sh文件
     if &filetype == 'sh'
@@ -607,9 +601,12 @@ function! AutoSetFileHead()
 
     "如果文件类型为python
     if &filetype == 'python'
-        " call setline(1, "\#!/usr/bin/env python")
-        " call append(1, "\# encoding: utf-8")
-        call setline(1, "\# -*- coding: utf-8 -*-")
+        call setline(1, "\#!/usr/bin/env python")
+    endif
+
+    if &filetype == 'scheme'
+        call setline(1, "\#!/usr/local/bin/guile -s")
+        call append(1, "!\#")
     endif
 
     normal G
@@ -659,13 +656,15 @@ endif
 
 
 " theme主题
-set background=light
+set background=dark
 set t_Co=256
 
 " colorscheme solarized
 " colorscheme molokai
-colorscheme neodark
-" color dracula
+" colorscheme neodark
+" colorscheme gruvbox
+color dracula
+let g:solarized_termcolors=256
 
 
 " 设置标记一列的背景颜色和数字一行颜色一致
