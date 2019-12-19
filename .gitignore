@@ -8,3 +8,5 @@ init.vim
 # temporary
 .netrwhist
 sessions/
+
+black/
