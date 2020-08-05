@@ -178,8 +178,8 @@ Plug 'kana/vim-textobj-indent'
 if count(g:bundle_groups, 'python')
     " python
     Plug 'hynek/vim-python-pep8-indent'
-    Plug 'stsewd/isort.nvim', {'do': ':UpdateRemotePlugins'}
-    Plug 'psf/black'
+    Plug 'darrikonn/vim-isort'
+    Plug 'psf/black', { 'tag': '19.10b0' }
 endif
 
 " Plug 'numirias/semshi', {'do': ':UpdateRemotePlugins'}
@@ -234,6 +234,7 @@ if count(g:bundle_groups, 'beta')
 
     " Plug 'robbles/logstash.vim'
     Plug 'ryanoasis/vim-devicons'
+    Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
     Plug 'ekalinin/dockerfile.vim'
 
     Plug 'ConradIrwin/vim-bracketed-paste'
@@ -335,13 +336,15 @@ call plug#end()
 " }}}
 
 " black {{{
-    let g:black_linelength = 88
     let g:black_skip_string_normalization = 1
     autocmd BufWritePre *.py execute ':silent Black'
 " }}}
 
 " isort {{{
-    let g:isort_command = 'isort'
+    " CWD to the root of git repo when opening file inside repo
+    let g:gitroot=system("git rev-parse --show-toplevel")
+    let g:is_gitrepo = v:shell_error == 0
+    silent! cd `=gitroot`
     autocmd BufWritePre *.py execute ':Isort'
 " }}}
 
@@ -374,7 +377,7 @@ call plug#end()
     let g:LanguageClient_serverStderr = '/tmp/langserver.log'
     let g:LanguageClient_loggingFile = '/tmp/langclient.log'
     let g:LanguageClient_setLoggingLevel = 'DEBUG'
-    let g:LanguageClient_useVirtualText = 0
+    let g:LanguageClient_useVirtualText = "No"
 
     let g:LanguageClient_selectionUI = "quickfix"
     let g:LanguageClient_diagnosticsEnable = 0
@@ -411,9 +414,6 @@ call plug#end()
 
 " deoplete {{{
     let g:deoplete#enable_at_startup = 1
-    if !exists('g:deoplete#omni#input_patterns')
-        let g:deoplete#omni#input_patterns = {}
-    endif
     inoremap <silent> <CR> <C-r>=<SID>my_cr_function()<CR>
     function! s:my_cr_function() abort
         return deoplete#close_popup() . "\<CR>"
@@ -696,13 +696,13 @@ call plug#end()
     let g:airline_symbols.branch = '⎇'
 
     let g:airline_powerline_fonts = 1
-    let g:airline_theme = 'fruit_punch'
+    let g:airline_theme = 'wombat'
 
     let g:airline#extensions#tabline#enabled = 1
     let g:airline#extensions#tabline#left_sep = ' '
     let g:airline#extensions#tabline#left_alt_sep = '|'
     let g:airline#extensions#tabline#formatter = 'unique_tail_improved'
-    let g:airline#extensions#tabline#show_buffers = 1
+    let g:airline#extensions#tabline#show_buffers = 0
     " let g:airline#extensions#tabline#show_tab_count = 1
     " let g:airline#extensions#tabline#switch_buffers_and_tabs = 1
 
@@ -761,7 +761,24 @@ call plug#end()
 " nerdtree nerdtreetabs {{{
     " map <leader>n :NERDTreeToggle<CR>
     let NERDTreeHighlightCursorline=1
-    let NERDTreeIgnore=[ '\.pyc$', '\.pyo$', '\.obj$', '\.o$', '\.so$', '\.egg$', '^\.git$', '^\.svn$', '^\.hg$', '^__pycache__$' ]
+    let NERDTreeIgnore=[
+        \ '\.pyc$',
+        \ '\.pyo$',
+        \ '\.obj$',
+        \ '\.o$',
+        \ '\.so$',
+        \ '\.egg$',
+        \ '\.DS_Store$',
+        \ '^\.git$[[dir]]',
+        \ '^\.vscode$[[dir]]',
+        \ '^\.svn$[[dir]]',
+        \ '^\.hg$[[dir]]',
+        \ '^__pycache__$[[dir]]',
+        \ '\.idea$[[dir]]',
+        \ '^\.cache$[[dir]]',
+        \ '_cache$[[dir]]',
+        \ '\.egg-info$[[dir]]',
+    \ ]
     "close vim if the only window left open is a NERDTree
     autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTreeType") && b:NERDTreeType == "primary") | q | end
     " s/v 分屏打开文件
@@ -781,6 +798,7 @@ call plug#end()
     let g:nerdtree_tabs_open_on_console_startup=0
     let g:nerdtree_tabs_open_on_gui_startup=0
 
+    let g:NERDTreeShowHidden = 1
 
     " NERDTREE-GIT
     " Special characters
@@ -796,6 +814,9 @@ call plug#end()
         \ 'Ignored'   : '☒',
         \ "Unknown"   : "?"
     \ }
+
+    let g:WebDevIconsNerdTreeBeforeGlyphPadding = ""
+    autocmd FileType nerdtree setlocal signcolumn=no
 " }}}
 
 
