@@ -110,11 +110,13 @@ Plug 'dyng/ctrlsf.vim'
 " ag
 Plug 'mileszs/ack.vim'
 
-Plug 'autozimu/LanguageClient-neovim', {
-    \ 'branch': 'next',
-    \ 'do': 'bash install.sh',
-    \ }
+" Plug 'autozimu/LanguageClient-neovim', {
+    " \ 'branch': 'next',
+    " \ 'do': 'bash install.sh',
+    " \ }
 
+Plug 'neovim/nvim-lspconfig'
+Plug 'Shougo/deoplete-lsp'
 Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
 
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -234,7 +236,7 @@ if count(g:bundle_groups, 'beta')
 
     " Plug 'robbles/logstash.vim'
     Plug 'ryanoasis/vim-devicons'
-    Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
+    " Plug 'tiagofumo/vim-nerdtree-syntax-highlight'
     Plug 'ekalinin/dockerfile.vim'
 
     Plug 'ConradIrwin/vim-bracketed-paste'
@@ -338,6 +340,7 @@ call plug#end()
 " black {{{
     let g:black_skip_string_normalization = 1
     autocmd BufWritePre *.py execute ':silent Black'
+    autocmd BufWritePost *.go !gofmt -w %
 " }}}
 
 " isort {{{
@@ -350,66 +353,109 @@ call plug#end()
 
 " ################### 自动补全 ###################
 
+set scl=no
+nnoremap <silent> gd <cmd>vsplit <bar> lua vim.lsp.buf.definition()<CR>
+nnoremap <silent> gp <cmd>lua vim.lsp.buf.type_definition()<CR>
+nnoremap <silent> K <cmd>lua vim.lsp.buf.hover()<CR>
+nnoremap <silent> gD <cmd>lua vim.lsp.buf.implementation()<CR>
+nnoremap <silent> <c-k> <cmd>lua vim.lsp.buf.signature_help()<CR>
+nnoremap <silent> gr <cmd>lua vim.lsp.buf.references()<CR>
+nnoremap <silent> <C-c>rr <cmd>lua vim.lsp.buf.rename()<CR>
+
+" https://github.com/neovim/nvim-lsp#pyls
+" https://www.xgithub.com/2019/11/14/neovim-nvim-lsp-common-configurations-for-neovim-language-servers/
+lua << EOF
+local nvim_lsp = require'nvim_lsp'
+nvim_lsp.pyls.setup{
+  settings = {
+    pyls = {
+      plugins = {
+        pylint = {
+          enabled = false,
+          args = {'--disable=bare-except,wildcard-import,too-many-public-methods,redefined-outer-name,expression-not-assigned,redefined-builtin,subprocess-run-check,too-many-instance-attributes,import-outside-toplevel,broad-except,logging-not-lazy,too-many-return-statements,C0111,R0903,too-many-arguments,multiple-statements,too-many-statements,too-many-locals,invalid-name,fixme,logging-fstring-interpolation,line-too-long,no-member,inconsistent-return-statements,too-many-lines,unused-argument,no-self-use'},
+        },
+        pycodestyle = {
+          enabled = true,
+          ignore = {'E402', 'E501', 'E722', 'E731', 'E225', 'E203', 'E702', 'F811', 'F405', 'F403', 'W391', 'F401', 'W503', 'W504', 'W291'},
+          addIgnore = {'E402', 'E501', 'E722', 'E731', 'E225', 'E203', 'E702', 'F811', 'F405', 'F403', 'W391', 'F401', 'W503', 'W504', 'W291'},
+          maxLineLength = 200,
+        },
+        pyflakes = {
+          enabled = false,
+        }
+      },
+      rope = {
+        ropeFolder = {'.'}
+      }
+    }
+  }
+}
+nvim_lsp.gopls.setup{
+  root_dir = nvim_lsp.util.root_pattern('.git');
+}
+EOF
+" }
+
 " LanguageClient {{{
-    let g:LanguageClient_rootMarkers = {
-        \ 'rust': ['Cargo.toml', '.git'],
-        \ 'python': ['lain.yaml', '.git'],
-        \ }
+    " let g:LanguageClient_rootMarkers = {
+        " \ 'rust': ['Cargo.toml', '.git'],
+        " \ 'python': ['lain.yaml', '.git'],
+        " \ }
 
-    let g:LanguageClient_serverCommands = {
-        \ 'css': ['css-languageserver', '--stdio'],
-        \ 'lisp': ['cl-lsp', 'stdio'],
-        \ 'dockerfile': ['docker-langserver', '--stdio'],
-        \ 'html': ['html-languageserver', '--stdio'],
-        \ 'python': ['pyls', '-v',  '-v', '--log-file=/tmp/pyls.log'],
-        \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
-        \ 'scheme': [expand('~/Sources/guile-language-server/wrapper')],
-        \ 'sh': ['bash-language-server', 'start'],
-        \ 'vim': [expand('~/.yarn/bin/vim-language-server'), '--stdio'],
-        \ 'vue': ['vls'],
-        \ 'yaml': ['yaml-language-server', '--stdio'],
-        \ }
+    " let g:LanguageClient_serverCommands = {
+        " \ 'css': ['css-languageserver', '--stdio'],
+        " \ 'lisp': ['cl-lsp', 'stdio'],
+        " \ 'dockerfile': ['docker-langserver', '--stdio'],
+        " \ 'html': ['html-languageserver', '--stdio'],
+        " \ 'python': ['pyls', '-v',  '-v', '--log-file=/tmp/pyls.log'],
+        " \ 'rust': ['rustup', 'run', 'nightly', 'rls'],
+        " \ 'scheme': [expand('~/Sources/guile-language-server/wrapper')],
+        " \ 'sh': ['bash-language-server', 'start'],
+        " \ 'vim': [expand('~/.yarn/bin/vim-language-server'), '--stdio'],
+        " \ 'vue': ['vls'],
+        " \ 'yaml': ['yaml-language-server', '--stdio'],
+        " \ }
 
-    let $RUST_BACKTRACE = 'full'
-    let g:LanguageClient_loadSettings = 1 " Use an absolute configuration path if you want system-wide settings
-    let g:LanguageClient_settingsPath = expand('~/.config/nvim/settings.json')
-    let g:LanguageClient_hasSnippetSupport = 0
-    let g:LanguageClient_serverStderr = '/tmp/langserver.log'
-    let g:LanguageClient_loggingFile = '/tmp/langclient.log'
-    let g:LanguageClient_setLoggingLevel = 'DEBUG'
-    let g:LanguageClient_useVirtualText = "No"
+    " let $RUST_BACKTRACE = 'full'
+    " let g:LanguageClient_loadSettings = 1 " Use an absolute configuration path if you want system-wide settings
+    " let g:LanguageClient_settingsPath = expand('~/.config/nvim/settings.json')
+    " let g:LanguageClient_hasSnippetSupport = 0
+    " let g:LanguageClient_serverStderr = '/tmp/langserver.log'
+    " let g:LanguageClient_loggingFile = '/tmp/langclient.log'
+    " let g:LanguageClient_setLoggingLevel = 'DEBUG'
+    " let g:LanguageClient_useVirtualText = "No"
 
-    let g:LanguageClient_selectionUI = "quickfix"
-    let g:LanguageClient_diagnosticsEnable = 0
-    let g:LanguageClient_diagnosticsList = "Disabled"
-    let g:LanguageClient_completionPreferTextEdit = 0
+    " let g:LanguageClient_selectionUI = "quickfix"
+    " let g:LanguageClient_diagnosticsEnable = 0
+    " let g:LanguageClient_diagnosticsList = "Disabled"
+    " let g:LanguageClient_completionPreferTextEdit = 0
 
-    " 把Server的补全API提交给Vim
-    " 一般有deoplete就可以用了，加上一条以防万一。
-    set completefunc=LanguageClient#complete
-    " 把Server的格式化API提交给Vim
-    set formatexpr=LanguageClient_textDocument_rangeFormatting()
+    " " 把Server的补全API提交给Vim
+    " " 一般有deoplete就可以用了，加上一条以防万一。
+    " set completefunc=LanguageClient#complete
+    " " 把Server的格式化API提交给Vim
+    " set formatexpr=LanguageClient_textDocument_rangeFormatting()
 
-    inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
-    inoremap <expr><S-tab> pumvisible() ? "\<c-p>" : "\<tab>"
+    " inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+    " inoremap <expr><S-tab> pumvisible() ? "\<c-p>" : "\<tab>"
 
-    function SetLSPShortcuts()
-        nnoremap <leader>ld :call LanguageClient#textDocument_definition({'gotoCmd': 'vsplit'})<CR>
-        nnoremap <leader>lr :call LanguageClient#textDocument_rename()<CR>
-        nnoremap <leader>lf :call LanguageClient#textDocument_formatting()<CR>
-        nnoremap <leader>lt :call LanguageClient#textDocument_typeDefinition()<CR>
-        nnoremap <leader>lx :call LanguageClient#textDocument_references()<CR>
-        nnoremap <leader>la :call LanguageClient_workspace_applyEdit()<CR>
-        nnoremap <leader>lc :call LanguageClient#textDocument_completion()<CR>
-        nnoremap <leader>lh :call LanguageClient#textDocument_hover()<CR>
-        nnoremap <leader>ls :call LanguageClient_textDocument_documentSymbol()<CR>
-        nnoremap <leader>lm :call LanguageClient_contextMenu()<CR>
-    endfunction()
+    " function SetLSPShortcuts()
+        " nnoremap <leader>ld :call LanguageClient#textDocument_definition({'gotoCmd': 'vsplit'})<CR>
+        " nnoremap <leader>lr :call LanguageClient#textDocument_rename()<CR>
+        " nnoremap <leader>lf :call LanguageClient#textDocument_formatting()<CR>
+        " nnoremap <leader>lt :call LanguageClient#textDocument_typeDefinition()<CR>
+        " nnoremap <leader>lx :call LanguageClient#textDocument_references()<CR>
+        " nnoremap <leader>la :call LanguageClient_workspace_applyEdit()<CR>
+        " nnoremap <leader>lc :call LanguageClient#textDocument_completion()<CR>
+        " nnoremap <leader>lh :call LanguageClient#textDocument_hover()<CR>
+        " nnoremap <leader>ls :call LanguageClient_textDocument_documentSymbol()<CR>
+        " nnoremap <leader>lm :call LanguageClient_contextMenu()<CR>
+    " endfunction()
 
-    augroup LSP
-      autocmd!
-      autocmd FileType css,dockerfile,html,lisp,python,rust,sh,vim,vue,yaml call SetLSPShortcuts()
-    augroup END
+    " augroup LSP
+      " autocmd!
+      " autocmd FileType css,dockerfile,html,lisp,python,rust,sh,vim,vue,yaml call SetLSPShortcuts()
+    " augroup END
 " }}}
 
 " deoplete {{{
@@ -436,15 +482,15 @@ call plug#end()
                 \ })
 
     call deoplete#enable_logging('DEBUG', '/tmp/deoplete.log')
-    call deoplete#custom#source('LanguageClient', 'is_debug_enabled', v:true)
+    " call deoplete#custom#source('LanguageClient', 'is_debug_enabled', v:true)
 
     " see https://muunyblue.github.io/520bae6649b42ff5a3c8c58b7fcfc5a9.html
     call deoplete#custom#option('sources', {
-        \ '_': ['file', 'around', 'buffer', 'ultisnips', 'LanguageClient'],
-        \ 'vue': ['file', 'around', 'ultisnips', 'LanguageClient', 'buffer'],
-        \ 'sh': ['file', 'around', 'ultisnips', 'buffer', 'LanguageClient'],
-        \ 'lua': ['file', 'around', 'ultisnips', 'buffer', 'LanguageClient'],
-        \ 'dockerfile': ['file', 'around', 'ultisnips', 'buffer', 'LanguageClient'],
+        \ '_': ['file', 'around', 'buffer', 'ultisnips', 'lsp'],
+        \ 'vue': ['file', 'around', 'ultisnips', 'lsp', 'buffer'],
+        \ 'sh': ['file', 'around', 'ultisnips', 'buffer', 'lsp'],
+        \ 'lua': ['file', 'around', 'ultisnips', 'buffer', 'lsp'],
+        \ 'dockerfile': ['file', 'around', 'ultisnips', 'buffer', 'lsp'],
         \})
     " automatically close the scratch window
     " see https://gregjs.com/vim/2016/configuring-the-deoplete-asynchronous-keyword-completion-plugin-with-tern-for-vim/
@@ -707,7 +753,7 @@ call plug#end()
     " let g:airline#extensions#tabline#switch_buffers_and_tabs = 1
 
     let g:airline#extensions#ale#enabled = 1
-    let g:airline#extensions#languageclient#enabled = 1
+    " let g:airline#extensions#languageclient#enabled = 1
 " }}}
 
 
@@ -802,7 +848,7 @@ call plug#end()
 
     " NERDTREE-GIT
     " Special characters
-    let g:NERDTreeIndicatorMapCustom = {
+    let g:NERDTreeGitStatusIndicatorMapCustom = {
         \ "Modified"  : "✹",
         \ "Staged"    : "✚",
         \ "Untracked" : "✭",
@@ -815,7 +861,19 @@ call plug#end()
         \ "Unknown"   : "?"
     \ }
 
-    let g:WebDevIconsNerdTreeBeforeGlyphPadding = ""
+    let g:webdevicons_enable = 1
+    let g:webdevicons_enable_vimfiler = 0
+    let g:webdevicons_enable_airline_tabline = 1
+    let g:webdevicons_enable_airline_statusline = 1
+    let g:webdevicons_enable_ctrlp = 1
+    let g:webdevicons_enable_startify = 1
+    let g:webdevicons_enable_flagship_statusline = 1
+    let g:webdevicons_conceal_nerdtree_brackets = 1
+    let g:WebDevIconsNerdTreeAfterGlyphPadding = ' '
+    let g:WebDevIconsNerdTreeGitPluginForceVAlign = 0
+    let g:WebDevIconsTabAirLineAfterGlyphPadding = ' '
+    let g:WebDevIconsTabAirLineBeforeGlyphPadding = ' '
+    let g:WebDevIconsUnicodeDecorateFolderNodes = 1
     autocmd FileType nerdtree setlocal signcolumn=no
 " }}}
 

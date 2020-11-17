@@ -11,7 +11,7 @@
                 "follow_imports": true
             }
         }
-    }
+    },
     "yaml": {
         "format": {
             "enable": true
